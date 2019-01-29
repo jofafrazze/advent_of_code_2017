@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace AdventOfCode
 {
@@ -205,6 +206,67 @@ namespace AdventOfCode
                 Extensions.Abs(Extensions.Subtract(y, p.y)), 
                 Extensions.Abs(Extensions.Subtract(z, p.z))
                 );
+        }
+    }
+
+    public class Map
+    {
+        public int width;
+        public int height;
+        public GenericPosition2D<int> pos;
+        public char[,] data;
+
+        public Map(int w, int h, GenericPosition2D<int> p, char fill = '\0')
+        {
+            width = w;
+            height = h;
+            pos = p;
+            data = new char[w, h];
+            for (int i = 0; i < w * h; i++)
+            {
+                data[i % w, i / w] = fill;
+            }
+        }
+
+        public char this[GenericPosition2D<int> p]
+        {
+            get
+            {
+                return data[p.x, p.y];
+            }
+            set
+            {
+                data[p.x, p.y] = value;
+            }
+        }
+
+        public void Expand(int n, char fill) { Expand(n, n, n, n, fill); }
+        public void Expand(int top, int right, int bottom, int left, char fill)
+        {
+            int w = left + right + width;
+            int h = top + bottom + height;
+            GenericPosition2D<int> s = new GenericPosition2D<int>(pos.x + left, pos.y + top);
+            Map m = new Map(w, h, s, fill);
+            for (int y = 0; y < height; y++)
+                for (int x = 0; x < width; x++)
+                    m.data[x + left, y + top] = data[x, y];
+            width = m.width;
+            height = m.height;
+            pos = m.pos;
+            data = m.data;
+        }
+
+        public void Print()
+        {
+            for (int y = 0; y < height; y++)
+            {
+                StringBuilder sb = new StringBuilder();
+                for (int x = 0; x < width; x++)
+                {
+                    sb.Append(data[x, y]);
+                }
+                Console.WriteLine(sb.ToString());
+            }
         }
     }
 
